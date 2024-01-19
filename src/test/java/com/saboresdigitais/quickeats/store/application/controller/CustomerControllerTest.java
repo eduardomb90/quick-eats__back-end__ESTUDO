@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.saboresdigitais.quickeats.store.SaboresDigitaisApplication;
 
@@ -16,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -46,5 +48,15 @@ public class CustomerControllerTest {
                 .andExpect(jsonPath("$.content[0].name", is("Updated Name")))
                 .andExpect(jsonPath("$.totalPages", greaterThanOrEqualTo(1)))
                 .andExpect(jsonPath("$.totalElements", greaterThanOrEqualTo(1)));
+    }
+
+    @Test
+    public void shouldDeleteCustomer() throws Exception {
+        Long customerIdToDelete = 1L; // Supondo que o cliente com ID 1 exista no banco de dados
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/customers/" + customerIdToDelete))
+                .andExpect(status().isOk())
+                .andExpect(result -> assertNotNull(result.getResponse().getContentAsString()))
+                .andExpect(jsonPath("$.success", is(true))); // Supondo que seu endpoint retorna um objeto JSON com uma propriedade 'success' em caso de sucesso
     }
 }

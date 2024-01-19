@@ -147,5 +147,14 @@ public class CustomerService {
         // Não é necessário chamar customerRepository.save(customer) pois a entidade já está sendo gerenciada
         return customer;
     }
+
+    @Transactional
+    public void deleteCustomer(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID fornecido é nulo");
+        }
+        customerRepository.deleteById(id);
+    }
+
 }
 
