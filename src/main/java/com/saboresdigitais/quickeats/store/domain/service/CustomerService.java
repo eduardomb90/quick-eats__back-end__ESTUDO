@@ -66,22 +66,22 @@ public class CustomerService {
         // Remove todos os caracteres não numéricos do CEP
         String cep = address.getCep().replaceAll("[^0-9]", "");
 
-        // Verifica se o endereço já existe
-        Optional<Address> existingAddress = addressRepository
-                .findByStreetAndCityAndStateAndCep(address.getStreet(), address.getCity(), address.getState(), cep);
+        // // Verifica se o endereço já existe
+        // Optional<Address> existingAddress = addressRepository
+        //         .findByStreetAndCityAndStateAndCep(address.getStreet(), address.getCity(), address.getState(), cep);
 
-        Address managedAddress;
-        if (!existingAddress.isPresent()) {
-            // Salva o novo endereço se ele ainda não existe
-            address.setCep(cep);
-            managedAddress = addressRepository.save(address);
-        } else {
-            // Utiliza o endereço existente
-            managedAddress = existingAddress.get();
-        }
+        // Address managedAddress;
+        // if (!existingAddress.isPresent()) {
+        //     // Salva o novo endereço se ele ainda não existe
+        //     address.setCep(cep);
+        //     managedAddress = addressRepository.save(address);
+        // } else {
+        //     // Utiliza o endereço existente
+        //     managedAddress = existingAddress.get();
+        // }
 
         String encryptedPassword = passwordEncoder.encode(rawPassword);
-        Customer newCustomer = new Customer(name, email, encryptedPassword, managedAddress);
+        Customer newCustomer = new Customer(name, email, encryptedPassword, address/*managedAddress*/);
         return customerRepository.save(newCustomer);
     }
 
@@ -149,12 +149,24 @@ public class CustomerService {
     }
 
     @Transactional
-    public void deleteCustomer(Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID fornecido é nulo");
+    public void deleteCustomer(Long customerId) {
+        Customer customer = customerRepository.findById(customerId)
+            .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado com ID: " + customerId));
+    
+        // Antes de excluir o cliente, verifica se o endereço está associado a outro cliente
+        Address address = customer.getAddress();
+        customerRepository.delete(customer); // exclui o cliente primeiro
+    
+        // Verifica se nenhum outro cliente está vinculado a este endereço
+        if (address != null && addressRepository.findByStreetAndCityAndStateAndCep(
+            address.getStreet(),
+            address.getCity(),
+            address.getState(),
+            address.getCep()).stream()
+            .noneMatch(c -> c.getId() != customerId)
+        ){
+            addressRepository.delete(address); // exclui o endereço se não estiver mais associado a nenhum cliente
         }
-        customerRepository.deleteById(id);
     }
-
 }
 

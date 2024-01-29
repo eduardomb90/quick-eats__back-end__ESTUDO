@@ -1,5 +1,8 @@
 package com.saboresdigitais.quickeats.store.application.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,8 @@ import org.springframework.data.web.PageableDefault;
 
 import com.saboresdigitais.quickeats.store.domain.entity.Customer;
 import com.saboresdigitais.quickeats.store.domain.service.CustomerService;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -53,7 +58,16 @@ public class CustomerController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCustomer(@PathVariable Long id) {
-        customerService.deleteCustomer(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        try {
+            customerService.deleteCustomer(id);
+            // Crie um Map para representar o objeto JSON com a propriedade 'success'
+            Map<String, Boolean> response = new HashMap<>();
+            response.put("success", true);
+            return ResponseEntity.ok(response);
+        } catch (EntityNotFoundException e) {
+            Map<String, Boolean> response = new HashMap<>();
+            response.put("success", false);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
     }
 }

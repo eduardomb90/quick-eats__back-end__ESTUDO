@@ -21,7 +21,7 @@ import com.saboresdigitais.quickeats.store.domain.vo.Address;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
-@ActiveProfiles("test")
+@ActiveProfiles("dev")
 @SpringBootTest(classes = SaboresDigitaisApplication.class)
 public class CustomerRepositoryTests {
 
@@ -44,7 +44,7 @@ public class CustomerRepositoryTests {
     @Test
     public void shouldSaveCustomerSuccessfully() {
         Address address = new Address("Rua dos Becos, n. 10, Apto 303 - Centro", "São Paulo", "SP", "01234567");
-        Customer savedCustomer = customerService.registerCustomer("Customer Não Persistente", "quartotest@example.com", "s3nh@_De_TE$te", address);
+        Customer savedCustomer = customerService.registerCustomer("Customer Persistente", "quintotest@example.com", "s3nh@_De_TE$te", address);
 
         assertThat(savedCustomer).isNotNull();
         assertThat(savedCustomer.getId()).isNotNull();

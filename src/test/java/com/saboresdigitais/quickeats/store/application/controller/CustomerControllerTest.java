@@ -4,12 +4,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.saboresdigitais.quickeats.store.SaboresDigitaisApplication;
+import com.saboresdigitais.quickeats.store.infrastructure.config.SecurityConfig;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -19,10 +21,11 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@ActiveProfiles("test")
+@ActiveProfiles("dev")
 @SpringBootTest
 @AutoConfigureMockMvc
 @ContextConfiguration(classes={SaboresDigitaisApplication.class})
+//@Import(SecurityConfig.class)
 public class CustomerControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -45,7 +48,7 @@ public class CustomerControllerTest {
                 .param("size", String.valueOf(size)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(1))))
-                .andExpect(jsonPath("$.content[0].name", is("Updated Name")))
+                .andExpect(jsonPath("$.content[0].name", is("Novo Customer")))
                 .andExpect(jsonPath("$.totalPages", greaterThanOrEqualTo(1)))
                 .andExpect(jsonPath("$.totalElements", greaterThanOrEqualTo(1)));
     }
