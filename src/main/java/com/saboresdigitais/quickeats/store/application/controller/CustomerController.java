@@ -4,11 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 
+import com.saboresdigitais.quickeats.store.domain.dto.CustomerDTO;
 import com.saboresdigitais.quickeats.store.domain.entity.Customer;
 import com.saboresdigitais.quickeats.store.domain.service.CustomerService;
 
@@ -41,6 +44,20 @@ public class CustomerController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(customers, HttpStatus.OK);
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<Customer> addCustomer(@RequestBody CustomerDTO customerDTO) {
+        try {
+            Customer customer = customerDTO.convertToEntity(customerDTO);
+            Customer savedCustomer = customerService.registerCustomer(customer.getName(), customer.getEmail(), customer.getPassword(), customer.getAddress());
+            return new ResponseEntity<>(savedCustomer, HttpStatus.CREATED);
+        } catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            // Para outras exceções, você pode retornar um Internal Server Error ou um status mais específico, dependendo da exceção.
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/{id}")

@@ -69,7 +69,6 @@ public class CustomerService {
         // // Verifica se o endereço já existe
         // Optional<Address> existingAddress = addressRepository
         //         .findByStreetAndCityAndStateAndCep(address.getStreet(), address.getCity(), address.getState(), cep);
-
         // Address managedAddress;
         // if (!existingAddress.isPresent()) {
         //     // Salva o novo endereço se ele ainda não existe
